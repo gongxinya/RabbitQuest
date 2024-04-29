@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"
+    integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://unpkg.com/@gohai/p5.webserial@^1/libraries/p5.webserial.js"></script>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+
+<body>
+  <script>
+    function preload() {
+      backgroundImage = loadImage('../pngs/background.jpg');
+      headFont = loadFont('../fonts/head.ttf');
+      bodyFont = loadFont('../fonts/body.ttf');
+    }
+
+    function setup() {
+      createCanvas(800, 600);
+      let buttonContainer = createDiv('');
+      buttonContainer.class('button-container');
+
+      button2 = createButton('End the journey');
+      button2.class('forest-button');
+      button2.position(width / 2 - 140, height / 2 + 80);
+      button2.mousePressed(goToPage2);
+      buttonContainer.child(button2);
+    }
+
+    function draw() {
+      background(backgroundImage);
+      textFont(headFont); // set the font to the forest font
+      textSize(32);
+      fill(255);
+      textAlign(CENTER, CENTER);
+      text('Yay The rabbit is safe and out of danger!', width / 2, height / 4);
+
+      textFont(bodyFont); // set the font to the forest font
+      textSize(24);
+      textAlign(LEFT, TOP); // set text alignment to top left
+      let textWidth = width - 100; // calculate the maximum width for the text
+      let x = 50; // x-coordinate of the text box
+      let y = height / 2 - 80; // y-coordinate of the text box
+      let textBoxHeight = height - y; // height of the text box
+      text('As you leave the Rabbit Museum, you cannot help but feel a sense of wonder and appreciation for these amazing creatures. The exhibits and displays have given you a newfound understanding of the many different breeds of rabbits and the important role they play in our world. As you step out into the sunlight, you make a promise to yourself to continue learning more about these fascinating animals and to do your part to ensure their well-being.', x, y, textWidth, textBoxHeight);
+    }
+
+    function goToPage1() {
+      currentPage = 1;
+    }
+
+    function goToPage2() {
+      currentPage = 2;
+    }
+
+    function mouseClicked() {
+      window.location.href = 'index.html';
+    }
+
+  </script>
+</body>
+
+</html>

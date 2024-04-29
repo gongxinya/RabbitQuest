@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"
+        integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://unpkg.com/@gohai/p5.webserial@^1/libraries/p5.webserial.js"></script>
+    <div id="container">
+        <script src="movingGame.js"></script>
+    </div>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+<body>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js";
+        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-functions.js";
+        import { getDatabase, serverTimestamp, push, ref, onValue, query, orderByChild, equalTo, limitToLast } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDBjUEw_DQNMQsZJWfTtLL0PQJoH-xF0kk",
+            authDomain: "sta-cs5041.firebaseapp.com",
+            databaseURL: "https://sta-cs5041-p4.firebaseio.com",
+            projectId: "sta-cs5041",
+            storageBucket: "sta-cs5041.appspot.com",
+            messagingSenderId: "639987847762",
+            appId: "1:639987847762:web:c5a35616a1aa1cf243458b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const functions = getFunctions(app);
+        const database = getDatabase(app);
+        const firebasetoken = "9dc08c76-44bb-4e21-976d-6b52df4df0aa";
+        const databaseRef = ref(database, 'data');
+        (async () => {
+            const getToken = httpsCallable(functions, "getToken");
+            const token = await getToken({ token: firebasetoken });
+            if (token?.data?.result === "ok" && token?.data?.token) {
+                const userCredentials = await signInWithCustomToken(auth, token.data.token);
+                const user = userCredentials.user;
+
+                const groups = [1, 2, 11, 12];
+                groups.forEach(group => {
+                    const queryRef = query(ref(database, 'data'), orderByChild('groupId'), equalTo(group), limitToLast(1));
+                    const textDataPromise = new Promise((resolve) => {
+                        onValue(queryRef, (snapshot) => {
+                            const data = snapshot.val();
+                            const textData = Object.values(data ?? {}).map(el => el?.integer);
+                            resolve(textData);
+                        });
+                    });
+
+                    // Later in your code, you can access the resolved textData like this:
+                    textDataPromise.then((textData) => {
+                        console.log(textData);
+                        if (textData !== 0) {
+                            localStorage.setItem(`textData${group}`, JSON.stringify(textData));
+                        }
+                    });
+                });
+
+                console.log("it win")
+
+                document.addEventListener('isVictoryChanged', function () {
+                    console.log("isVictoryChanged")
+                    if (isVictory) {
+                        console.log("it win")
+                        push(databaseRef, {
+                            userId: user.uid,
+                            groupId: 20,
+                            timestamp: serverTimestamp(),
+                            type: "str",
+                            string: "Congratulations! The bunny has been sent home"
+                        });
+                        window.location.href = 'dodgeGame.html';
+                    }
+                });
+
+                // const inputField = document.getElementById('text-field');
+                const buttonField = document.getElementById('submit-button');
+                buttonField.addEventListener('click', () => {
+
+                    let counter = 0;
+
+                    push(databaseRef, {
+                        userId: user.uid,
+                        groupId: 21,
+                        timestamp: serverTimestamp(),
+                        type: "int",
+                        integer: 0
+                    });
+                    push(databaseRef, {
+                        userId: user.uid,
+                        groupId: 22,
+                        timestamp: serverTimestamp(),
+                        type: "int",
+                        integer: 100
+                    });
+
+
+                    // Set an interval to update the integer value every 3 seconds
+                    const intervalId = setInterval(() => {
+                        // Calculate the new integer value based on the current cycle number
+                        const cycleNum = Math.floor(counter / 2);
+                        const newInteger = cycleNum % 2 === 0 ? 0 : 100;
+
+                        // Update the record in the database with the new integer value
+                        push(databaseRef, {
+                            userId: user.uid,
+                            groupId: 23,
+                            timestamp: serverTimestamp(),
+                            type: "int",
+                            integer: newInteger
+                        });
+                        console.log(newInteger)
+
+                        counter++;
+
+                        // Stop the interval after 10 cycles
+                        if (counter >= 40) {
+                            clearInterval(intervalId);
+                        }
+                    }, 3000);
+
+                });
+                // inputField.removeAttribute('disabled');
+                buttonField.removeAttribute('disabled');
+            } else {
+                console.error(token?.data?.reason ?? "unknownError")
+            }
+        })();
+    </script>
+</body>
+
+</html>

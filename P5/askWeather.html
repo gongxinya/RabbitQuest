@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"
+        integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://unpkg.com/@gohai/p5.webserial@^1/libraries/p5.webserial.js"></script>
+    <div id="container">
+        <script src="askweather.js"></script>
+    </div>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+
+<body>
+    <script type="module">
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js";
+        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-functions.js";
+        import { getDatabase, serverTimestamp, push, ref, onValue, query, orderByChild, equalTo, limitToLast } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDBjUEw_DQNMQsZJWfTtLL0PQJoH-xF0kk",
+            authDomain: "sta-cs5041.firebaseapp.com",
+            databaseURL: "https://sta-cs5041-p4.firebaseio.com",
+            projectId: "sta-cs5041",
+            storageBucket: "sta-cs5041.appspot.com",
+            messagingSenderId: "639987847762",
+            appId: "1:639987847762:web:c5a35616a1aa1cf243458b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const functions = getFunctions(app);
+        const database = getDatabase(app);
+        const firebasetoken = "9dc08c76-44bb-4e21-976d-6b52df4df0aa";
+        (async () => {
+            const getToken = httpsCallable(functions, "getToken");
+            const token = await getToken({ token: firebasetoken });
+            if (token?.data?.result === "ok" && token?.data?.token) {
+                const userCredentials = await signInWithCustomToken(auth, token.data.token);
+                const user = userCredentials.user;
+
+                onValue(query(ref(database, 'data'), orderByChild('groupId'), equalTo(1), limitToLast(1)), (snapshot) => {
+                    const data = snapshot.val();
+                    const textData = Object.values(data ?? {}).map(el => el?.integer?.toString() ?? '');
+                    console.log(textData);
+                });
+                const buttonField = document.getElementById('getWeather-button');
+
+                buttonField.addEventListener('click', () => {
+                    window.location.href = 'waitingPage.html';
+                    console.log("clicked")
+                    const databaseRef = ref(database, 'data');
+                    push(databaseRef, {
+                        userId: user.uid,
+                        groupId: 20,
+                        timestamp: serverTimestamp(),
+                        type: "str",
+                        string: "Hi, let's help the rabbit go home"
+                    });
+
+                    push(databaseRef, {
+                        userId: user.uid,
+                        groupId: 20,
+                        timestamp: serverTimestamp(),
+                        type: "str",
+                        string: "What's the rabbit's climate like?"
+                    });
+
+                    push(databaseRef, {
+                        userId: user.uid,
+                        groupId: 20,
+                        timestamp: serverTimestamp(),
+                        type: "str",
+                        string: "Just long press button3 to tell me"
+                    });
+                });
+
+            } else {
+                console.error(token?.data?.reason ?? "unknownError")
+            }
+        })();
+    </script>
+</body>
+
+</html>

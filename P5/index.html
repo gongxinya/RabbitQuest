@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"
+    integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://unpkg.com/@gohai/p5.webserial@^1/libraries/p5.webserial.js"></script>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+
+<body>
+  <script>
+    function preload() {
+      backgroundImage = loadImage('../pngs/background.jpg');
+      headFont = loadFont('../fonts/head.ttf');
+      bodyFont = loadFont('../fonts/body.ttf');
+    }
+
+    function setup() {
+      createCanvas(800, 600);
+      let buttonContainer = createDiv('');
+      buttonContainer.class('button-container');
+
+      button1 = createButton('Life exploration');
+      button1.class('forest-button');
+      button1.position(width / 2 - 120, height / 2);
+      button1.mousePressed(goToPage1);
+      buttonContainer.child(button1);
+
+
+      button2 = createButton('Predator avoidance');
+      button2.class('forest-button');
+      button2.position(width / 2 - 120, height / 2 + 80);
+      button2.mousePressed(goToPage2);
+      buttonContainer.child(button2);
+    }
+
+    function draw() {
+      background(backgroundImage);
+      textFont(headFont); // set the font to the forest font
+      textSize(32);
+      fill(255);
+      textAlign(CENTER, CENTER);
+      text('Lepus Labs: Discovering the Science of Rabbits', width / 2, height / 4);
+
+      textFont(bodyFont); // set the font to the forest font
+      textSize(22);
+      textAlign(LEFT, TOP); // set text alignment to top left
+      let textWidth = width - 100; // calculate the maximum width for the text
+      let x = 50; // x-coordinate of the text box
+      let y = height / 2 - 80; // y-coordinate of the text box
+      let textBoxHeight = height - y; // height of the text box
+      text('Explore the fascinating world of rabbits at Bunny Haven Museum! Discover the living habits of these furry creatures and learn how they avoid natural enemies. From burrows to breeding habits, our exhibits offer an interactive and engaging experience for children and adults alike.', x, y, textWidth, textBoxHeight);
+    }
+
+    function goToPage1() {
+      currentPage = 1;
+    }
+
+    function goToPage2() {
+      currentPage = 2;
+    }
+
+    function mouseClicked() {
+      if (currentPage === 1) {
+        window.location.href = 'askWeather.html';
+      } else if (currentPage === 2) {
+        window.location.href = 'dodgeGame.html';
+      }
+    }
+
+  </script>
+</body>
+
+</html>
